@@ -1,0 +1,6 @@
+# Owner: Member C
+target/
+.idea/
+*.iml
+out/
+CODEX_REPORT.md
