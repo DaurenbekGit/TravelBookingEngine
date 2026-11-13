@@ -1,8 +1,8 @@
-// Owner: Member A
 package kz.aitu.travel.offer;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+
 import kz.aitu.travel.domain.City;
 import kz.aitu.travel.domain.Money;
 

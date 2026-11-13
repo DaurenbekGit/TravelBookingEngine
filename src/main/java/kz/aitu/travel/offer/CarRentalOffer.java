@@ -1,10 +1,10 @@
-// Owner: Member A
 package kz.aitu.travel.offer;
 
 import java.util.Objects;
-import kz.aitu.travel.offer.visitor.OfferVisitor;
+
 import kz.aitu.travel.domain.Money;
 import kz.aitu.travel.domain.TravelType;
+import kz.aitu.travel.offer.visitor.OfferVisitor;
 
 /** Factory Method (Creational): concrete carrental Product; Visitor (Behavioral): ConcreteElement. */
 public final class CarRentalOffer extends TravelOffer {
