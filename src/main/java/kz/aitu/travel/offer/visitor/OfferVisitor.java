@@ -1,3 +1,4 @@
+// Owner: Member A
 package kz.aitu.travel.offer.visitor;
 
 import kz.aitu.travel.offer.CarRentalOffer;

@@ -1,13 +1,13 @@
+// Owner: Member A
 package kz.aitu.travel.offer;
 
+import kz.aitu.travel.offer.visitor.OfferVisitor;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
 import kz.aitu.travel.domain.City;
 import kz.aitu.travel.domain.Money;
 import kz.aitu.travel.domain.TravelType;
-import kz.aitu.travel.offer.visitor.OfferVisitor;
 
 /** Factory Method (Creational): abstract Product; Visitor (Behavioral): Element with shared immutable data. */
 public abstract class TravelOffer {

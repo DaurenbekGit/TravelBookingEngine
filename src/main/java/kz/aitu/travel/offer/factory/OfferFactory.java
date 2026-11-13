@@ -1,7 +1,7 @@
+// Owner: Member A
 package kz.aitu.travel.offer.factory;
 
 import java.util.Objects;
-
 import kz.aitu.travel.offer.OfferSpec;
 import kz.aitu.travel.offer.TravelOffer;
 
