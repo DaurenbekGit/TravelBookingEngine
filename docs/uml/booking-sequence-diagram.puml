@@ -1,0 +1,70 @@
+@startuml
+' Owner: Abylay
+actor Traveller
+participant ConsoleApp as UI
+participant TravelBookingFacade as Facade
+participant OfferSearchService as Search
+participant SupplierClient as Adapter
+participant OfferFactory as Factory
+participant OfferRankingStrategy as Ranking
+participant BookingService as Service
+participant BookingBuilder as Builder
+participant ExtraType as Extras
+participant Booking
+participant BookingStatus as Status
+participant TravelOffer as Offer
+participant CancellationFeeVisitor as Fees
+participant BookingRepository as Repository
+participant NotificationCenter as Events
+participant "Email / SMS products" as Channels
+note over Events,Channels : AppContext subscribes products from the selected NotificationChannelFactory.
+Traveller -> UI : search
+UI -> Facade : searchOffers(criteria, ranking)
+Facade -> Search : search(criteria, ranking)
+Search -> Adapter : search(criteria)
+Adapter -> Factory : create(spec)
+Factory --> Adapter : typed offer
+Adapter --> Search : normalized offers
+Search -> Ranking : rank(offers)
+Search --> Facade : ranked offers
+Facade --> UI : offers
+Traveller -> UI : book with extras
+UI -> Facade : createBooking(customer, ids, extras)
+Facade -> Service : create(customer, offers, extras)
+Service -> Extras : apply(item)
+Extras --> Service : decorated item
+Service -> Builder : forCustomer().addItem().build()
+Builder --> Service : Booking
+Service -> Repository : save(booking)
+Service --> Facade : booking
+Facade --> UI : booking
+loop confirm then pay
+  Traveller -> UI : action
+  UI -> Facade : confirmBooking / payBooking
+  Facade -> Service : confirm / pay
+  Service -> Booking : confirm / pay
+  Booking -> Status : canTransitionTo(target)
+  Status --> Booking : allowed
+  Service -> Repository : save(booking)
+  Service -> Events : publish(typed status change)
+  Events -> Channels : onEvent(event)
+  Channels --> Traveller : family-language notification
+end
+Traveller -> UI : cancel
+UI -> Facade : cancelBooking(id)
+Facade -> Service : cancel(id)
+Service -> Booking : cancel()
+Booking -> Status : canTransitionTo(CANCELLED)
+loop each booked offer snapshot
+  Booking -> Offer : accept(cancellationFees)
+  Offer -> Fees : visitFlight / visitHotel / visitCarRental(this)
+  Fees --> Booking : fee (through accept)
+end
+Booking -> Booking : cap fee, calculate paid refund, set status
+Service -> Repository : save(booking)
+Service -> Events : publish(status, fee, refund)
+Events -> Channels : onEvent(event)
+Channels --> Traveller : cancellation fee and refund
+Service --> Facade : booking
+Facade --> UI : booking
+@enduml

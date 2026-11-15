@@ -1,4 +1,4 @@
-// Owner: Member C
+// Owner: Abylay
 package kz.aitu.travel.facade;
 
 import java.util.Arrays;

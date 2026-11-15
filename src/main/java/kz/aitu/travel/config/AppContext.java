@@ -1,4 +1,4 @@
-// Owner: Member C
+// Owner: Abylay
 package kz.aitu.travel.config;
 
 import java.io.InputStream;

@@ -1,0 +1,63 @@
+@startuml
+' Owner: Abylay
+skinparam classAttributeIconSize 0
+class ConsoleApp
+class DemoScenario
+class TravelBookingFacade <<Facade>>
+class OfferSearchService <<Context>>
+interface SupplierClient <<Target>>
+abstract class OfferFactory <<Creator>>
+interface OfferRankingStrategy <<Strategy>>
+abstract class TravelOffer <<Product, Element>>
+interface OfferVisitor <<Visitor>>
+class TaxCalculationVisitor <<ConcreteVisitor>>
+class OfferDetailsVisitor <<ConcreteVisitor>>
+class CancellationFeeVisitor <<ConcreteVisitor>>
+class OfferCatalog
+class BookingService
+class BookingBuilder <<Builder>>
+class Booking <<Product>>
+interface BookingItem <<Component>>
+enum BookingStatus
+interface BookingRepository
+class InMemoryBookingRepository
+class PriceWatchService
+interface EventPublisher <<Subject>>
+class NotificationCenter <<ConcreteSubject>>
+interface TravelEventListener <<Observer>>
+interface NotificationChannelFactory <<AbstractFactory>>
+abstract class EmailNotificationListener <<AbstractProduct>>
+abstract class SmsNotificationListener <<AbstractProduct>>
+ConsoleApp --> TravelBookingFacade
+DemoScenario --> TravelBookingFacade
+TravelBookingFacade --> OfferSearchService
+TravelBookingFacade --> BookingService
+TravelBookingFacade --> PriceWatchService
+TravelBookingFacade --> OfferVisitor : details and taxes
+TravelBookingFacade --> OfferCatalog
+OfferSearchService --> SupplierClient
+SupplierClient ..> OfferFactory : adapters use
+OfferFactory ..> TravelOffer
+OfferSearchService --> OfferRankingStrategy
+OfferSearchService --> OfferCatalog
+TravelOffer ..> OfferVisitor : accept
+OfferVisitor <|.. TaxCalculationVisitor
+OfferVisitor <|.. OfferDetailsVisitor
+OfferVisitor <|.. CancellationFeeVisitor
+BookingService ..> BookingBuilder
+BookingBuilder ..> Booking
+Booking *--> BookingItem
+Booking --> BookingStatus : validates
+Booking --> OfferVisitor : cancellation
+BookingService --> BookingRepository
+BookingRepository <|.. InMemoryBookingRepository
+BookingService --> EventPublisher
+PriceWatchService --> OfferCatalog
+PriceWatchService --> EventPublisher
+EventPublisher <|.. NotificationCenter
+NotificationCenter o--> TravelEventListener
+NotificationChannelFactory ..> EmailNotificationListener : creates matching family
+NotificationChannelFactory ..> SmsNotificationListener : creates matching family
+TravelEventListener <|.. EmailNotificationListener
+TravelEventListener <|.. SmsNotificationListener
+@enduml

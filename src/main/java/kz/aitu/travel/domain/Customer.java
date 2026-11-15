@@ -1,4 +1,4 @@
-// Owner: Member C
+// Owner: Abylay
 package kz.aitu.travel.domain;
 
 /** Customer identity is its stable id; contact details are immutable. */

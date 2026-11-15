@@ -44,6 +44,23 @@ The compiler uses `--release 17`, `-Xlint:all` and `-Werror`.
 | Facade | Structural | C | TravelBookingFacade; ConsoleApp and DemoScenario clients |
 | Observer | Behavioral | C | EventPublisher, NotificationCenter, TravelEventListener; Email, Sms and Audit observers |
 
+## Architecture
+
+`Main` delegates wiring to `AppContext`. The CLI calls `TravelBookingFacade` for all
+application operations. Search uses supplier targets, injected abstract creators and
+ranking strategies. BookingService creates decorated items with BookingBuilder,
+validates lifecycle changes through BookingStatus, saves through BookingRepository and
+publishes through EventPublisher. PriceWatchService replaces immutable catalog offers
+and publishes only genuine drops. All service construction is in AppContext.
+Product creation, builders and decorator wrappers are intentionally
+created by their pattern participants, not treated as injected long-lived services.
+
+Shared C contracts are staged before their consumers. There is no cycle between
+services: the repository interface references Booking, but Booking does not depend on
+that interface. Offer elements and the OfferVisitor contract compile as one logical
+group because double dispatch requires mutual type references within A's module.
+See the per-file ownership header and `docs/OWNERSHIP.tsv` for the complete inventory.
+
 <!-- BEGIN MEMBER A SECTION: Search & Offers -->
 ## Search & Offers
 
@@ -96,3 +113,71 @@ suppliers. Catalog prices persist across repeated searches so a simulated price 
 is not overwritten by the static supplier fixture.
 <!-- END MEMBER B SECTION -->
 
+## Platform & Integration
+
+InMemoryBookingRepository is an ordinary class with a public constructor. AppContext
+creates one store per application graph and injects it through BookingRepository.
+Separate contexts have independent data and id sequences; tests need no global reset.
+
+NotificationChannelFactory creates matching email/SMS products. Its local family uses
+Russian text and Kazakhstan phone formatting; its international family uses English.
+AppContext selects the family with `--lang=ru` or `--lang=en` (default). The CLI remains
+English; this option controls notification channels. The demo also replays its last
+audited event through both families, without adding duplicate audit entries.
+AuditLogListener remains independent of either family.
+
+## Interactive walkthrough
+
+The default customer is Demo Traveller. Menu 1 asks for type, origin, destination,
+date, days and ranking. Example: `1`, `1` (flight), `ALA`, `NQZ`, `2026-12-20`, `1`,
+`1` (cheapest). Copy an offer id from the table into menu 2 or 3. Menu 3 accepts
+comma-separated ids and extra names such as `BAGGAGE,INSURANCE,FLEXIBLE`.
+Use menus 4/5/6 to confirm/pay/cancel, 7 for bookings, 8 to watch, 9 to simulate a
+drop and 10 for audit history. Invalid inputs show a message and return to the menu;
+end-of-input exits safely. Flight origin is ignored for hotel/car searches.
+
+## Demo and evidence
+
+```text
+=== [Builder] Assemble a multi-item booking ===
+=== [Decorator] Stack baggage, insurance and flexibility; add breakfast ===
+BK-1001 | Demo Traveller | PENDING | 168 650 KZT
+=== [Visitor] Type-specific details, taxes and cancellation fees ===
+Illustrative taxes (display only): 2 500 KZT
+=== [Observer] Email, SMS and audit listen to successful status changes ===
+Handled: Cannot pay booking BK-1001: booking is PENDING, confirm it first
+Cancelled; cancellation fee 37 500 KZT; refund 131 150 KZT (simulation)
+Catalog now: 40 500 KZT; booking snapshot: 45 000 KZT
+=== [Abstract Factory] Same event via Local (RU) and International (EN) notification families ===
+Audit events: 4
+=== Demo complete ===
+```
+
+`docs/screenshots/` contains actual terminal screenshots, not generated mockups.
+`docs/verification/` retains build logs, demo output and interactive smoke input/output.
+`docs/uml/` has five PlantUML source diagrams and rendered SVG versions. Use a PlantUML
+extension or `java -jar plantuml.jar -tsvg docs/uml/*.puml` to render them again.
+The renderer is a documentation tool, not a project dependency.
+
+## Testing and contributions
+
+Tests use plain in-test fakes, no mocking library. B's tests get a fresh private
+repository. C's tests create normal repositories and check save, lookup, customer
+filtering, missing ids and context isolation. All 12 status/action combinations are
+covered, plus conversions, ranking ties, stacking, watchers and facade integration.
+
+`CODEX_REPORT.md` contains file dependencies, measured ownership, a cross-member commit
+order and verification results. It is deliberately git-ignored. No repository or
+commits have been created. The ownership labels are a suggested division of work,
+not a claim that three people already authored this generated project. Each member
+should implement/review and commit their real contribution using their own identity;
+do not backdate commits or attribute generated work to someone who did not do it.
+
+## Scope
+
+In-memory, single-process teaching application. Supplier fixtures use synthetic
+availability and fixed illustrative prices/durations for all supported routes/dates.
+Observers run synchronously and notification output is simulated. Repository storage
+and id allocation are thread-safe; this is not a distributed reservation system.
+The six Java test files group each member's pattern tests; there are no extra
+frameworks or production dependencies.

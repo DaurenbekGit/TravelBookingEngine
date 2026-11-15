@@ -1,0 +1,55 @@
+@startuml
+' Owner: Abylay
+skinparam classAttributeIconSize 0
+title Abylay - Platform & Integration
+class TravelBookingFacade <<Facade>>
+class ConsoleApp <<Client>>
+class OfferSearchService
+class BookingService
+class PriceWatchService
+interface BookingRepository
+class InMemoryBookingRepository
+ConsoleApp --> TravelBookingFacade
+TravelBookingFacade --> OfferSearchService
+TravelBookingFacade --> BookingService
+TravelBookingFacade --> PriceWatchService
+BookingService --> BookingRepository
+BookingRepository <|.. InMemoryBookingRepository
+interface EventPublisher <<Subject>>
+class NotificationCenter <<ConcreteSubject>>
+interface TravelEventListener <<Observer>>
+class AuditLogListener <<ConcreteObserver>>
+EventPublisher <|.. NotificationCenter
+NotificationCenter o--> TravelEventListener
+TravelEventListener <|.. AuditLogListener
+BookingService --> EventPublisher : status change
+PriceWatchService --> EventPublisher : price drop
+TravelBookingFacade --> AuditLogListener : log
+interface NotificationChannelFactory <<AbstractFactory>>
+class LocalNotificationFactory <<ConcreteFactory>>
+class InternationalNotificationFactory <<ConcreteFactory>>
+abstract class EmailNotificationListener <<AbstractProduct, Observer>>
+abstract class SmsNotificationListener <<AbstractProduct, Observer>>
+class RussianEmailNotificationListener <<ConcreteProduct, ConcreteObserver>>
+class EnglishEmailNotificationListener <<ConcreteProduct, ConcreteObserver>>
+class RussianSmsNotificationListener <<ConcreteProduct, ConcreteObserver>>
+class EnglishSmsNotificationListener <<ConcreteProduct, ConcreteObserver>>
+NotificationChannelFactory <|.. LocalNotificationFactory
+NotificationChannelFactory <|.. InternationalNotificationFactory
+NotificationChannelFactory ..> EmailNotificationListener : creates
+NotificationChannelFactory ..> SmsNotificationListener : creates
+EmailNotificationListener <|-- RussianEmailNotificationListener
+EmailNotificationListener <|-- EnglishEmailNotificationListener
+SmsNotificationListener <|-- RussianSmsNotificationListener
+SmsNotificationListener <|-- EnglishSmsNotificationListener
+TravelEventListener <|.. EmailNotificationListener
+TravelEventListener <|.. SmsNotificationListener
+LocalNotificationFactory ..> RussianEmailNotificationListener
+LocalNotificationFactory ..> RussianSmsNotificationListener
+InternationalNotificationFactory ..> EnglishEmailNotificationListener
+InternationalNotificationFactory ..> EnglishSmsNotificationListener
+class AppContext <<CompositionRoot>>
+AppContext ..> InMemoryBookingRepository : new instance
+AppContext --> NotificationChannelFactory : selects language
+AppContext ..> TravelBookingFacade : wires graph
+@enduml

@@ -1,4 +1,4 @@
-// Owner: Member C
+// Owner: Abylay
 package kz.aitu.travel.notification;
 
 import kz.aitu.travel.notification.event.TravelEvent;
