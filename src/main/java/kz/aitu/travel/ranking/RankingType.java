@@ -1,4 +1,4 @@
-// Owner: Member B
+// Owner: Nurkhat
 package kz.aitu.travel.ranking;
 
 /** Strategy selection keys; AppContext supplies an EnumMap without type switches. */

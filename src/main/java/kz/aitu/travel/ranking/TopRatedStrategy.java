@@ -1,4 +1,4 @@
-// Owner: Member B
+// Owner: Nurkhat
 package kz.aitu.travel.ranking;
 
 import java.util.ArrayList;

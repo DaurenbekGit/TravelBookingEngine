@@ -1,7 +1,7 @@
 @startuml
-' Owner: Member B
+' Owner: Nurkhat
 skinparam classAttributeIconSize 0
-title Member B - Booking & Ranking
+title Nurkhat - Booking & Ranking
 class BookingBuilder <<Builder>> {
   +forCustomer(customer)
   +addItem(item)

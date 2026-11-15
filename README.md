@@ -64,3 +64,35 @@ or 3 000 KZT for a rental. Money handles rounding to tiyn. Taxes are shown separ
 and never change Booking.totalPrice().
 <!-- END MEMBER A SECTION -->
 
+<!-- BEGIN MEMBER B SECTION: Booking -->
+## Booking & Ranking
+
+The builder requires a customer and at least one item, rejects duplicate offer ids,
+and copies its item list. Items keep immutable quote snapshots. Later price drops
+change the catalog, never existing booking totals.
+
+Extras are applied in the order selected. Baggage adds 8 000 KZT, breakfast adds
+5 000 KZT per hotel night, insurance adds 5% of its wrapped subtotal, and flexibility
+adds 7 000 KZT. For a 45 000 KZT flight, baggage -> insurance -> flexibility gives
+`(45000 + 8000) * 1.05 + 7000 = 62650 KZT`. Because insurance uses the current subtotal,
+changing extra order can change the price. Duplicate extras are rejected by the service.
+
+Allowed transitions: Pending -> Confirmed or Cancelled; Confirmed -> Paid or Cancelled;
+Paid -> Cancelled with a simulated refund minus cancellation fees. Cancelled is terminal.
+BookingStatus stores the allowed transitions in an immutable map; this is ordinary
+domain validation, not an additional design pattern. Cancellation visits each booked
+offer snapshot, caps the aggregate fee at the decorated total, and reports both fee
+and refund. Unpaid bookings quote the fee but refund zero because no money was paid.
+The exercise
+requires cancellation even without the flexibility extra, so flexibility is a labelled
+paid add-on and does not gate the transition or waive the illustrative fee. No real refund occurs.
+Strategies return fresh lists. Cheapest sorts by price; fastest by duration then
+price; top-rated by descending rating then price; best-value by descending
+`rating * 10000 / priceKzt`, then rating and price. Free offers rank first, with rating
+breaking ties. IDs break remaining ties for deterministic output. The EnumMap in
+AppContext makes ranking selectable without type switches. Search merges all matching
+suppliers; production wires one supplier per type, while tests also merge two flight
+suppliers. Catalog prices persist across repeated searches so a simulated price drop
+is not overwritten by the static supplier fixture.
+<!-- END MEMBER B SECTION -->
+

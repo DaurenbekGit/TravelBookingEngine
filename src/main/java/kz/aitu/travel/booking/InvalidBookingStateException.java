@@ -1,4 +1,4 @@
-// Owner: Member B
+// Owner: Nurkhat
 package kz.aitu.travel.booking;
 
 /** Reports an invalid lifecycle operation without changing the booking. */
