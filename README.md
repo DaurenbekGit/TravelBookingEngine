@@ -1,4 +1,3 @@
-<!-- Owner: Member C; marked module sections may later be added by their owners. -->
 # Travel Booking Engine
 
 A Java 17 console application for a three-member Design Patterns final project.
@@ -28,21 +27,21 @@ The compiler uses `--release 17`, `-Xlint:all` and `-Werror`.
 
 | Member | Module | Creational | Structural | Behavioral |
 |---|---|---|---|---|
-| Member A | Search & Offers | Factory Method | Adapter | Visitor |
-| Member B | Booking & Ranking | Builder | Decorator | Strategy |
-| Member C | Platform & Integration | Abstract Factory | Facade | Observer |
+| Daurenbek | Search & Offers | Factory Method | Adapter | Visitor |
+| Nurkhat | Booking & Ranking | Builder | Decorator | Strategy |
+| Abylay | Platform & Integration | Abstract Factory | Facade | Observer |
 
 | Pattern | Type | Member | Key classes |
 |---|---|---|---|
-| Factory Method | Creational | A | OfferFactory; FlightOfferFactory, HotelOfferFactory, CarRentalOfferFactory; TravelOffer products |
-| Adapter | Structural | A | SupplierClient; SkyJetFlightAdapter, GlobalStayHotelAdapter, DriveNowCarAdapter; three APIs |
-| Strategy | Behavioral | B | OfferRankingStrategy; four strategies; OfferSearchService |
-| Builder | Creational | B | BookingBuilder, Booking |
-| Decorator | Structural | B | BookingItem, OfferBookingItem, BookingItemDecorator; four extras |
-| Visitor | Behavioral | A | OfferVisitor; TaxCalculationVisitor, CancellationFeeVisitor, OfferDetailsVisitor; TravelOffer elements |
-| Abstract Factory | Creational | C | NotificationChannelFactory; LocalNotificationFactory, InternationalNotificationFactory; English/Russian Email/Sms products |
-| Facade | Structural | C | TravelBookingFacade; ConsoleApp and DemoScenario clients |
-| Observer | Behavioral | C | EventPublisher, NotificationCenter, TravelEventListener; Email, Sms and Audit observers |
+| Factory Method | Creational | Daurenbek | OfferFactory; FlightOfferFactory, HotelOfferFactory, CarRentalOfferFactory; TravelOffer products |
+| Adapter | Structural | Daurenbek | SupplierClient; SkyJetFlightAdapter, GlobalStayHotelAdapter, DriveNowCarAdapter; three APIs |
+| Strategy | Behavioral | Nurkhat | OfferRankingStrategy; four strategies; OfferSearchService |
+| Builder | Creational | Nurkhat | BookingBuilder, Booking |
+| Decorator | Structural | Nurkhat | BookingItem, OfferBookingItem, BookingItemDecorator; four extras |
+| Visitor | Behavioral | Daurenbek | OfferVisitor; TaxCalculationVisitor, CancellationFeeVisitor, OfferDetailsVisitor; TravelOffer elements |
+| Abstract Factory | Creational | Abylay | NotificationChannelFactory; LocalNotificationFactory, InternationalNotificationFactory; English/Russian Email/Sms products |
+| Facade | Structural | Abylay | TravelBookingFacade; ConsoleApp and DemoScenario clients |
+| Observer | Behavioral | Abylay | EventPublisher, NotificationCenter, TravelEventListener; Email, Sms and Audit observers |
 
 ## Architecture
 
@@ -55,13 +54,11 @@ and publishes only genuine drops. All service construction is in AppContext.
 Product creation, builders and decorator wrappers are intentionally
 created by their pattern participants, not treated as injected long-lived services.
 
-Shared C contracts are staged before their consumers. There is no cycle between
-services: the repository interface references Booking, but Booking does not depend on
-that interface. Offer elements and the OfferVisitor contract compile as one logical
-group because double dispatch requires mutual type references within A's module.
-See the per-file ownership header and `docs/OWNERSHIP.tsv` for the complete inventory.
+There is no cycle between services: the repository interface references Booking, but
+Booking does not depend on that interface. Offer elements and the OfferVisitor contract
+compile as one logical group because double dispatch requires mutual type references
+within the Search & Offers module.
 
-<!-- BEGIN MEMBER A SECTION: Search & Offers -->
 ## Search & Offers
 
 SkyJet returns semicolon-separated flight strings. GlobalStay accepts city names and
@@ -79,9 +76,7 @@ OfferDetailsVisitor supplies type-specific details to the existing CLI screen.
 CancellationFeeVisitor quotes 10% of flight base price, one hotel night's base price,
 or 3 000 KZT for a rental. Money handles rounding to tiyn. Taxes are shown separately
 and never change Booking.totalPrice().
-<!-- END MEMBER A SECTION -->
 
-<!-- BEGIN MEMBER B SECTION: Booking -->
 ## Booking & Ranking
 
 The builder requires a customer and at least one item, rejects duplicate offer ids,
@@ -111,7 +106,6 @@ AppContext makes ranking selectable without type switches. Search merges all mat
 suppliers; production wires one supplier per type, while tests also merge two flight
 suppliers. Catalog prices persist across repeated searches so a simulated price drop
 is not overwritten by the static supplier fixture.
-<!-- END MEMBER B SECTION -->
 
 ## Platform & Integration
 
@@ -153,25 +147,16 @@ Audit events: 4
 === Demo complete ===
 ```
 
-`docs/screenshots/` contains actual terminal screenshots, not generated mockups.
-`docs/verification/` retains build logs, demo output and interactive smoke input/output.
 `docs/uml/` has five PlantUML source diagrams and rendered SVG versions. Use a PlantUML
 extension or `java -jar plantuml.jar -tsvg docs/uml/*.puml` to render them again.
 The renderer is a documentation tool, not a project dependency.
 
-## Testing and contributions
+## Testing
 
-Tests use plain in-test fakes, no mocking library. B's tests get a fresh private
-repository. C's tests create normal repositories and check save, lookup, customer
+Tests use plain in-test fakes, no mocking library. Booking tests get a fresh private
+repository. Platform tests create normal repositories and check save, lookup, customer
 filtering, missing ids and context isolation. All 12 status/action combinations are
 covered, plus conversions, ranking ties, stacking, watchers and facade integration.
-
-`CODEX_REPORT.md` contains file dependencies, measured ownership, a cross-member commit
-order and verification results. It is deliberately git-ignored. No repository or
-commits have been created. The ownership labels are a suggested division of work,
-not a claim that three people already authored this generated project. Each member
-should implement/review and commit their real contribution using their own identity;
-do not backdate commits or attribute generated work to someone who did not do it.
 
 ## Scope
 
