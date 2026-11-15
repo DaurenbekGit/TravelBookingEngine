@@ -1,0 +1,58 @@
+@startuml
+' Owner: Member B
+skinparam classAttributeIconSize 0
+title Member B - Booking & Ranking
+class BookingBuilder <<Builder>> {
+  +forCustomer(customer)
+  +addItem(item)
+  +withNote(note)
+  +build(): Booking
+}
+class Booking <<Product>> {
+  +confirm()
+  +pay()
+  +cancel()
+  +totalPrice(): Money
+}
+class BookingService <<Client>>
+interface BookingItem <<Component>>
+class OfferBookingItem <<ConcreteComponent>>
+abstract class BookingItemDecorator <<Decorator>>
+class TravelInsuranceDecorator <<ConcreteDecorator>>
+class BreakfastDecorator <<ConcreteDecorator>>
+class ExtraBaggageDecorator <<ConcreteDecorator>>
+class FlexibleCancellationDecorator <<ConcreteDecorator>>
+BookingService ..> BookingBuilder
+BookingService ..> BookingItemDecorator
+BookingBuilder ..> Booking : builds
+Booking *-- BookingItem
+BookingItem <|.. OfferBookingItem
+BookingItem <|.. BookingItemDecorator
+BookingItemDecorator o--> BookingItem : wrapped
+BookingItemDecorator <|-- TravelInsuranceDecorator
+BookingItemDecorator <|-- BreakfastDecorator
+BookingItemDecorator <|-- ExtraBaggageDecorator
+BookingItemDecorator <|-- FlexibleCancellationDecorator
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  PAID
+  CANCELLED
+  +canTransitionTo(target)
+}
+Booking --> BookingStatus : validates
+note right of BookingStatus : Ordinary domain validation
+interface OfferRankingStrategy <<Strategy>>
+class CheapestFirstStrategy <<ConcreteStrategy>>
+class FastestFirstStrategy <<ConcreteStrategy>>
+class TopRatedStrategy <<ConcreteStrategy>>
+class BestValueStrategy <<ConcreteStrategy>>
+class "OfferSearchService (A)" as Search <<Context>>
+Search --> OfferRankingStrategy
+OfferRankingStrategy <|.. CheapestFirstStrategy
+OfferRankingStrategy <|.. FastestFirstStrategy
+OfferRankingStrategy <|.. TopRatedStrategy
+OfferRankingStrategy <|.. BestValueStrategy
+interface "OfferVisitor (A)" as Visitor
+Booking --> Visitor : cancellation fee
+@enduml
