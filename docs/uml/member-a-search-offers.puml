@@ -1,0 +1,60 @@
+@startuml
+' Owner: Member A
+skinparam classAttributeIconSize 0
+title Member A - Search & Offers
+class OfferFactory <<Creator>> {
+  +create(spec): TravelOffer
+  #createOffer(spec): TravelOffer
+}
+class FlightOfferFactory <<ConcreteCreator>>
+class HotelOfferFactory <<ConcreteCreator>>
+class CarRentalOfferFactory <<ConcreteCreator>>
+abstract class TravelOffer <<Product, Element>>
+class FlightOffer <<ConcreteProduct, ConcreteElement>>
+class HotelOffer <<ConcreteProduct, ConcreteElement>>
+class CarRentalOffer <<ConcreteProduct, ConcreteElement>>
+OfferFactory <|-- FlightOfferFactory
+OfferFactory <|-- HotelOfferFactory
+OfferFactory <|-- CarRentalOfferFactory
+TravelOffer <|-- FlightOffer
+TravelOffer <|-- HotelOffer
+TravelOffer <|-- CarRentalOffer
+OfferFactory ..> TravelOffer : creates
+FlightOfferFactory ..> FlightOffer
+HotelOfferFactory ..> HotelOffer
+CarRentalOfferFactory ..> CarRentalOffer
+interface SupplierClient <<Target>>
+class SkyJetFlightAdapter <<Adapter>>
+class GlobalStayHotelAdapter <<Adapter>>
+class DriveNowCarAdapter <<Adapter>>
+class SkyJetApi <<Adaptee>>
+class GlobalStayApi <<Adaptee>>
+class DriveNowApi <<Adaptee>>
+SupplierClient <|.. SkyJetFlightAdapter
+SupplierClient <|.. GlobalStayHotelAdapter
+SupplierClient <|.. DriveNowCarAdapter
+SkyJetFlightAdapter --> SkyJetApi
+GlobalStayHotelAdapter --> GlobalStayApi
+DriveNowCarAdapter --> DriveNowApi
+SkyJetFlightAdapter --> OfferFactory
+GlobalStayHotelAdapter --> OfferFactory
+DriveNowCarAdapter --> OfferFactory
+interface OfferVisitor <<Visitor>> {
+  +visitFlight(offer)
+  +visitHotel(offer)
+  +visitCarRental(offer)
+}
+class TaxCalculationVisitor <<ConcreteVisitor>>
+class CancellationFeeVisitor <<ConcreteVisitor>>
+class OfferDetailsVisitor <<ConcreteVisitor>>
+OfferVisitor <|.. TaxCalculationVisitor
+OfferVisitor <|.. CancellationFeeVisitor
+OfferVisitor <|.. OfferDetailsVisitor
+TravelOffer ..> OfferVisitor : accept(visitor)
+FlightOffer ..> OfferVisitor : visitFlight(this)
+HotelOffer ..> OfferVisitor : visitHotel(this)
+CarRentalOffer ..> OfferVisitor : visitCarRental(this)
+OfferVisitor ..> FlightOffer
+OfferVisitor ..> HotelOffer
+OfferVisitor ..> CarRentalOffer
+@enduml
