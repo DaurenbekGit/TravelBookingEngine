@@ -1,7 +1,7 @@
 @startuml
-' Owner: Member A
+' Owner: Daurenbek
 skinparam classAttributeIconSize 0
-title Member A - Search & Offers
+title Daurenbek - Search & Offers
 class OfferFactory <<Creator>> {
   +create(spec): TravelOffer
   #createOffer(spec): TravelOffer

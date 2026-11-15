@@ -24,6 +24,43 @@ Only JUnit 5 is a dependency, and only in test scope. A first Maven build needs
 internet access to Maven Central for plugins and JUnit. The application runs offline.
 The compiler uses `--release 17`, `-Xlint:all` and `-Werror`.
 
-## Project setup
+## Team and patterns
 
-This repository is being assembled step by step. The initial Maven configuration and repository ignore rules are provided. More modules and documentation are added in later steps.
+| Member | Module | Creational | Structural | Behavioral |
+|---|---|---|---|---|
+| Member A | Search & Offers | Factory Method | Adapter | Visitor |
+| Member B | Booking & Ranking | Builder | Decorator | Strategy |
+| Member C | Platform & Integration | Abstract Factory | Facade | Observer |
+
+| Pattern | Type | Member | Key classes |
+|---|---|---|---|
+| Factory Method | Creational | A | OfferFactory; FlightOfferFactory, HotelOfferFactory, CarRentalOfferFactory; TravelOffer products |
+| Adapter | Structural | A | SupplierClient; SkyJetFlightAdapter, GlobalStayHotelAdapter, DriveNowCarAdapter; three APIs |
+| Strategy | Behavioral | B | OfferRankingStrategy; four strategies; OfferSearchService |
+| Builder | Creational | B | BookingBuilder, Booking |
+| Decorator | Structural | B | BookingItem, OfferBookingItem, BookingItemDecorator; four extras |
+| Visitor | Behavioral | A | OfferVisitor; TaxCalculationVisitor, CancellationFeeVisitor, OfferDetailsVisitor; TravelOffer elements |
+| Abstract Factory | Creational | C | NotificationChannelFactory; LocalNotificationFactory, InternationalNotificationFactory; English/Russian Email/Sms products |
+| Facade | Structural | C | TravelBookingFacade; ConsoleApp and DemoScenario clients |
+| Observer | Behavioral | C | EventPublisher, NotificationCenter, TravelEventListener; Email, Sms and Audit observers |
+
+<!-- BEGIN MEMBER A SECTION: Search & Offers -->
+## Search & Offers
+
+SkyJet returns semicolon-separated flight strings. GlobalStay accepts city names and
+quotes USD per night. DriveNow supplies a map of vehicle DTOs with tiyn per day.
+Adapters convert these to typed OfferSpec records and ask an injected OfferFactory to
+create the correct immutable product. SupplierRates contains the one fixed USD rate:
+1 USD = 500 KZT. This is a simulation assumption, not a current exchange-rate claim.
+Hotels and cars are priced for the entire requested stay/rental.
+
+OfferVisitor adds operations to the stable offer hierarchy using double dispatch:
+`offer.accept(visitor)` calls the matching `visitFlight`, `visitHotel` or `visitCarRental`.
+TaxCalculationVisitor shows a fixed 2 500 KZT airport fee, a 1 000 KZT/night hotel tax,
+or 12% rental VAT. These are illustrative teaching rules, not actual legal tax rates.
+OfferDetailsVisitor supplies type-specific details to the existing CLI screen.
+CancellationFeeVisitor quotes 10% of flight base price, one hotel night's base price,
+or 3 000 KZT for a rental. Money handles rounding to tiyn. Taxes are shown separately
+and never change Booking.totalPrice().
+<!-- END MEMBER A SECTION -->
+

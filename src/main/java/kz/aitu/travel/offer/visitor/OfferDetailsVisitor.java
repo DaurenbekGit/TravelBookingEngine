@@ -1,4 +1,4 @@
-// Owner: Member A
+// Owner: Daurenbek
 package kz.aitu.travel.offer.visitor;
 
 import kz.aitu.travel.offer.CarRentalOffer;

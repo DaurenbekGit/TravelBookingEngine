@@ -1,4 +1,4 @@
-// Owner: Member A
+// Owner: Daurenbek
 package kz.aitu.travel.supplier.adapter;
 
 import java.math.BigDecimal;
