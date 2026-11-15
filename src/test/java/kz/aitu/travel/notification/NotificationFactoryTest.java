@@ -71,10 +71,23 @@ class NotificationFactoryTest {
     }
     @ParameterizedTest @ValueSource(strings = {"en", "ru"})
     void argumentSelectsNormalFamilyAndDemoShowsBoth(String language) {
+
         var bytes = new ByteArrayOutputStream();
-        AppContext.run(new String[]{"--lang=" + language, "--demo"}, java.io.InputStream.nullInputStream(),
-                new PrintStream(bytes));
+
+        var output = new PrintStream(
+                bytes,
+                true,
+                java.nio.charset.StandardCharsets.UTF_8
+        );
+
+        AppContext.run(
+                new String[]{"--lang=" + language, "--demo"},
+                java.io.InputStream.nullInputStream(),
+                output
+        );
+
         String text = bytes.toString(java.nio.charset.StandardCharsets.UTF_8);
+
         String normal = text.substring(0, text.indexOf("=== [Abstract Factory]"));
         assertTrue(normal.contains(language.equals("ru") ? "[ЭЛ.ПОЧТА" : "[EMAIL"));
         String preview = text.substring(text.indexOf("=== [Abstract Factory]"));
